@@ -1,6 +1,6 @@
 # Badginator
 
-TODO: Write a gem description
+Add badges to models
 
 ## Installation
 
