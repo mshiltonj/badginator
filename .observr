@@ -1,3 +1,7 @@
 watch(/spec\/(.*)_spec.rb/) do |match|
   system "rspec spec/#{match[1]}_spec.rb"
 end
+
+watch(/lib\/(badginator.*).rb/) do |match|
+  system "rspec spec/#{match[1]}_spec.rb"
+end

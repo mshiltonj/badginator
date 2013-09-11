@@ -74,7 +74,7 @@ describe "Badginator" do
       end
 
       it "should checking for a winning condition" do
-        @nominee = TestNominee.new
+        @nominee = Nominee.new
 
         @nominee.should_receive(:winner?).and_return(true)
 
