@@ -73,12 +73,37 @@ describe "Badginator" do
 
       end
 
-      it "should checking for a winning condition" do
+      it "should check for a winning condition" do
         @nominee = Nominee.new
-
         @nominee.should_receive(:winner?).and_return(true)
 
-        @nominee.try_award_badge(@badge_to_win)
+        awarded_badge = AwardedBadge.new(awardee: @nominee, badge_code: @badge_to_win)
+        @nominee.should_receive(:has_badge?).and_return(false)
+
+        status = @nominee.try_award_badge(@badge_to_win)
+
+        expect(status.code).to eql(Badginator::WON)
+
+      end
+
+      it "should return a did not win status if the conditions is not met" do
+        @nominee = Nominee.new
+        @nominee.should_receive(:winner?).and_return(false)
+
+        status = @nominee.try_award_badge(@badge_to_win)
+        expect(status.code).to eql(Badginator::DID_NOT_WIN)
+      end
+
+      it "should check for already won condition" do
+        @nominee = Nominee.new
+        @nominee.should_receive(:winner?).and_return(true)
+
+        awarded_badge = AwardedBadge.new(awardee: @nominee, badge_code: @badge_to_win)
+        @nominee.should_receive(:has_badge?).and_return(true)
+
+        status = @nominee.try_award_badge(@badge_to_win)
+
+        expect(status.code).to eql(Badginator::ALREADY_WON)
       end
     end
   end

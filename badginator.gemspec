@@ -20,6 +20,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "rails", "~> 4.0.0"
 
   spec.add_development_dependency "sqlite3"
+  spec.add_development_dependency "awesome_print"
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "rspec-rails"
   spec.add_development_dependency "observr"

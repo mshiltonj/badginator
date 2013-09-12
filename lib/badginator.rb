@@ -1,10 +1,16 @@
 require 'singleton'
 require "badginator/version"
 require "badginator/badge"
+require "badginator/status"
 require "badginator/nominee"
 
 class Badginator
   include Singleton
+
+  DID_NOT_WIN = 1
+  WON         = 2
+  ALREADY_WON = 3
+  ERROR       = 4
 
   def initialize
     @badges = {}
@@ -31,5 +37,14 @@ class Badginator
 
   def self.get_badge(badge_code)
     self.instance.get_badge(badge_code)
+  end
+
+  def self.Status(status_code)
+    case status_code
+      when DID_NOT_WIN, WON, ALREADY_WON, ERROR
+        Badginator::Status.new code: status_code
+      else
+        rails TypeError, "Cannot convert #{status_code} to Status"
+    end
   end
 end
