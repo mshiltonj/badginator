@@ -14,7 +14,7 @@ class Badginator
       end
     end
 
-    setters :code, :name, :description, :condition
+    setters :code, :name, :description, :condition, :disabled, :level, :image, :reward
 
 
     def build_badge(&block)

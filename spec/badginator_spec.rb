@@ -24,11 +24,15 @@ describe "Badginator" do
         code thecode
         name thename
         description "Foo'd something"
+        image :s3
+        level 2
         condition ->(nominee, context) {
           return true
         }
+        reward ->(nominee, context){
+          1
+        }
       end
-
     end
 
     it "return a badge definition" do
@@ -104,6 +108,17 @@ describe "Badginator" do
         status = @nominee.try_award_badge(@badge_to_win)
 
         expect(status.code).to eql(Badginator::ALREADY_WON)
+      end
+
+      it "should return the badge if won" do
+        @nominee = Nominee.new
+        @nominee.should_receive(:winner?).and_return(true)
+
+        awarded_badge = AwardedBadge.new(awardee: @nominee, badge_code: @badge_to_win)
+        @nominee.should_receive(:has_badge?).and_return(false)
+
+        status = @nominee.try_award_badge(@badge_to_win)
+        expect(status.awarded_badge.badge.code).to eql(awarded_badge.badge.code)
       end
     end
   end

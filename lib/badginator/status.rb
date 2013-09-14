@@ -4,6 +4,7 @@ class Badginator
 
     def initialize(args = {})
       @code = args[:code]
+      @awarded_badge = args[:badge]
     end
 
   end

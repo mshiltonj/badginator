@@ -14,13 +14,16 @@ class Badginator
 
       if success
         if (self.has_badge?(badge_name))
-          Badginator::Status(Badginator::ALREADY_WON)
+          status = Badginator::Status(Badginator::ALREADY_WON)
         else
-          Badginator::Status(Badginator::WON)
+          awarded_badge = AwardedBadge.create! awardee: self, badge_code: badge.code
+          status = Badginator::Status(Badginator::WON, awarded_badge)
         end
       else
-        Badginator::Status(Badginator::DID_NOT_WIN)
+        status = Badginator::Status(Badginator::DID_NOT_WIN)
       end
+
+      status
     end
 
     def has_badge?(badge_code)

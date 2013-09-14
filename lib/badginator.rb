@@ -20,9 +20,18 @@ class Badginator
     @badges.fetch(badge_code)
   end
 
+  def badges
+    @badges.values.select { |badge| ! badge.disabled }
+   end
+
+  def self.badges
+    self.instance.badges
+  end
+
   def define_badge(*args, &block)
     badge = Badge.new
     badge.build_badge &block
+    badge.freeze
 
     if @badges.key?(badge.code)
       raise "badge code '#{badge.code}' already defined."
@@ -39,10 +48,10 @@ class Badginator
     self.instance.get_badge(badge_code)
   end
 
-  def self.Status(status_code)
+  def self.Status(status_code, badge = nil)
     case status_code
       when DID_NOT_WIN, WON, ALREADY_WON, ERROR
-        Badginator::Status.new code: status_code
+        Badginator::Status.new code: status_code, badge: badge
       else
         rails TypeError, "Cannot convert #{status_code} to Status"
     end
