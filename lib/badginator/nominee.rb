@@ -3,7 +3,7 @@ class Badginator
 
     def self.included(base)
       base.class_eval {
-        has_many :badges, class_name: "AwardedBadge"
+        has_many :badges, class_name: "AwardedBadge", as: :awardee
       }
     end
 
