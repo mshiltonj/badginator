@@ -6,21 +6,13 @@ of a Rails application, like User or Player. Useful for game-oriented applicatio
 
 ## Installation
 
-Add this line to your application's Gemfile:
+Add this line to your application's Gemfile and `bundle install`:
 
     gem 'badginator'
 
-And then execute:
-
-    $ bundle install
-
-Or install it yourself as:
-
-    $ gem install badginator
-
 Once installed run the install generator:
 
-   $ rails g badginator:install
+    $ rails g badginator:install
 
 This generates a model and migration for AwardedBadges. Be sure the run the migration:
 
@@ -31,6 +23,75 @@ This generates a model and migration for AwardedBadges. Be sure the run the migr
 
 Define your badges in `config/initializers/badginator.rb`, using the Badginator.define_badge() method. All badges
 are awarded to a *nominee* based on *condition* in a given *context*.
+
+```ruby
+Badginator.define_badge do
+  code :first_blood
+  name First Blood
+  description  "Made your first kill"
+  condition ->(nominee, context) {
+    nominee.kills > 1
+  }
+  reward 1
+  image "http:://example.org/images/first_blood_badge.gif"
+  level :bronze
+end
+
+Badginator.define_badge do
+  code :hoarder
+  name "Gold Hoarder"
+  description  "You have collected over 100,000 gold!"
+  condition ->(nominee, context) {
+    nominee.gold > 100000
+  }
+  reward 10
+  image "http://example.org/images/hoarder_badge.gif"
+end
+```
+A class becomes eligible to be nominated when you include the Badginator::Nominee module:
+```ruby
+class Player
+  include Badginator::Nominee
+
+  [...]
+
+end
+```
+After that setup, you are ready to go!
+
+Try to award a player an award:
+```ruby
+status = player.try_award_badge(:hoarder, context) # context is optional
+```
+The result will have one of four states:
+
+1. Did not win (no action taken)
+2. Already won (player already has badge, no action taken)
+3. Won (badge added)
+4. Error (something went wrong)
+
+If the badges was awarded, the return status has the badge attached:
+```ruby
+if status.code == Badginator::WON
+  awarded_badge = status.awarded_badge
+end
+```
+The `awarded_badge` is an ActiveRecord object, and has the defined badge attached to it:
+```ruby
+awarded_badge.badge.code #=> :hoarder
+
+awarded_badge.reward     #=> 10
+```
+
+You can get a list of badges the player has won:
+```ruby
+player.badges
+```
+
+Lastly, you can get a list of all available badges (minus the disabled ones):
+```ruby
+Badginator.badges
+```
 
 ## Properties
 Badges have a few properties:
@@ -64,77 +125,6 @@ Also takes the two `nominee` and `context` params. This lambda should have no ef
 application code to actually assign rewards.
 
 This could be a numeric value like bonus points or gold. Or and in-game object to add to a Player's inventory.
-
-
-### Examples
-
-    Badginator.define_badge do
-      code :first_blood
-      name First Blood
-      description  "Made your first kill"
-      condition ->(nominee, context) {
-        nominee.kills > 1
-      }
-      reward 1
-      image "http:://example.org/images/first_blood_badge.gif"
-      level :bronze
-    end
-
-    Badginator.define_badge do
-      code :hoarder
-      name "Gold Hoarder"
-      description  "You have collected over 100,000 gold!"
-      condition ->(nominee, context) {
-        nominee.gold > 100000
-      }
-      reward 10
-      image "http://example.org/images/hoarder_badge.gif"
-    end
-
-A class becomes eligible to be nominated when you include the Badginator::Nominee module:
-
-    class Player
-      include Badginator::Nominee
-
-      [...]
-
-    end
-
-After that setup, you are ready to go!
-
-Try to award a player an award:
-
-    status = player.try_award_badge(:hoarder, context) # context is optional
-
-The result will have one of four states:
-
-1. Did not win (no action taken)
-2. Already won (player already has badge, no action taken)
-3. Won (badge added)
-4. Error (something went wrong)
-
-If the badges was awarded, the return status has the badge attached:
-
-    if status.code == Badginator::WON
-      awarded_badge = status.awarded_bade
-    end
-
-The `awarded_badge` is an ActiveRecord object, and has the defined badge attached to it:
-
-    $ awarded_badge.badge.code #=> :hoarder
-
-    $ awarded_badge.reward     #=> 10
-
-
-You can get a list of badges the player has won:
-
-    $ player.badges
-
-
-Lastly, you can get a list of all available badges (minus the disabled ones):
-
-    $ Badginator.badges
-
 
 
 ## Contributing
